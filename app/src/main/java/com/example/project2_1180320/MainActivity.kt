@@ -5,15 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
 import com.example.project2_1180320.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -31,7 +28,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         fragmentContainer.getMapAsync(this)
 
         binding.addLocationBtn.setOnClickListener { addLocation() }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -75,7 +71,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (latitude != noLatitudeSelected && longitude != noLongitudeSelected) {
             val location =
-                Locations(0, latitude, longitude)
+                Locations(
+                    0,
+                    latitude.substringAfter(":").trim(),
+                    longitude.substringAfter(":").trim()
+                )
             try {
                 database.insert(location)
                 Toast.makeText(this, R.string.location_added, Toast.LENGTH_SHORT).show()

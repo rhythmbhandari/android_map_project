@@ -3,9 +3,6 @@ package com.example.project2_1180320
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import com.example.project2_1180320.databinding.ActivityMainBinding
 import com.example.project2_1180320.databinding.ActivitySavedLocationBinding
 
 class SavedLocationActivity : AppCompatActivity() {
@@ -26,11 +23,13 @@ class SavedLocationActivity : AppCompatActivity() {
     private fun displayAllLocation() {
         val locationArray = database.read()
         if (locationArray.isNotEmpty()) {
-            binding.displayLocations.text = ""
+            val stringBuilder = StringBuilder()
             for (location in locationArray) {
-                binding.displayLocations.append("${location.id}\n${location.latitude} ${location.longitude}\n\n")
+                stringBuilder.append("${location.id}\nLatitude: ${location.latitude}\nLongitude: ${location.longitude}\n\n")
             }
-
+            binding.displayLocations.text = stringBuilder.toString()
+        } else {
+            binding.displayLocations.text = getString(R.string.no_location_saved)
         }
     }
 }
