@@ -5,59 +5,63 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class LocationDatabase (val context: Context):SQLiteOpenHelper(context,DATABASENAME,null,VERSION){
-    companion object{
-        val DATABASENAME = "LocationDatabase"
-        val VERSION = 1
-        val TABLENAME = "Coordinate"
-        val COLUMNID = "id"
-        val COLUMNNAME1 = "latitude"
-        val COLUMNNAME2="longitude"
+class LocationDatabase(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, VERSION) {
+    companion object {
+        const val DATABASE_NAME = "LocationDatabase"
+        const val VERSION = 1
+        const val TABLE_NAME = "Coordinate"
+        const val COLUMN_ID = "id"
+        const val COLUMN_LATITUDE = "latitude"
+        const val COLUMN_LONGITUDE = "longitude"
     }
 
-    override fun onCreate(p0: SQLiteDatabase?) {
-        val query = "CREATE TABLE $TABLENAME($COLUMNID Integer Primary Key, $COLUMNNAME1 Text, $COLUMNNAME2 Text)"
-        p0?.execSQL(query)
+    override fun onCreate(db: SQLiteDatabase?) {
+        val query =
+            "CREATE TABLE $TABLE_NAME($COLUMN_ID Integer Primary Key, $COLUMN_LATITUDE Text, $COLUMN_LONGITUDE Text)"
+        db?.execSQL(query)
     }
 
-    override fun onUpgrade(p0: SQLiteDatabase?, p1: Int, p2: Int) {
-        val query = "DROP TABLE IF EXISTS $TABLENAME"
-        p0?.execSQL(query)
-        onCreate(p0)
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        val query = "DROP TABLE IF EXISTS $TABLE_NAME"
+        db?.execSQL(query)
+        onCreate(db)
     }
 
-    fun insert(data:Locations){
+    fun insert(data: Locations) {
         val db = writableDatabase
 
         val contentValue = ContentValues().apply {
-            put(COLUMNNAME1,data.Latitude)
-            put(COLUMNNAME2,data.Longitude)
+            put(COLUMN_LATITUDE, data.latitude)
+            put(COLUMN_LONGITUDE, data.longitude)
         }
 
-        db.insert(TABLENAME,null,contentValue)
+        db.insert(TABLE_NAME, null, contentValue)
         db.close()
-
     }
-    fun read():ArrayList<Locations>{
+
+    fun read(): ArrayList<Locations> {
 
         val locationsArrays = ArrayList<Locations>()
 
         val db = readableDatabase
-        val query = "SELECT * FROM $TABLENAME"
-        val cursor = db.rawQuery(query,null)
+        val query = "SELECT * FROM $TABLE_NAME"
+        val cursor = db.rawQuery(query, null)
 
-        while (cursor.moveToNext())
-        {
-            val id =cursor.getInt(cursor.getColumnIndexOrThrow(COLUMNID))
-            val latitude = cursor.getString(cursor.getColumnIndexOrThrow(COLUMNNAME1))
-            val longitude = cursor.getString(cursor.getColumnIndexOrThrow(COLUMNNAME2))
+        try {
+            while (cursor.moveToNext()) {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID))
+                val latitude = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LATITUDE))
+                val longitude = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LONGITUDE))
 
-            val location = Locations(id,latitude,longitude)
-            locationsArrays.add(location)
+                val location = Locations(id, latitude, longitude)
+                locationsArrays.add(location)
+            }
+        } finally {
+            cursor.close()
+            db.close()
         }
-        db.close()
-        return locationsArrays
 
+        return locationsArrays
     }
 
 }

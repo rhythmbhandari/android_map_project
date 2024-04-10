@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import com.example.project2_1180320.databinding.ActivityMainBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -16,72 +17,73 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.MarkerOptions
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+    private lateinit var binding: ActivityMainBinding
     private val database = LocationDatabase(this)
-    private var myMap:GoogleMap? = null
-    private lateinit var latitudeTextView: TextView
-    private lateinit var longitudeTextView: TextView
-    private lateinit var addLocationBtn:Button
+    private var myMap: GoogleMap? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val fragmentContainer = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as SupportMapFragment
-        fragmentContainer.getMapAsync(this)
-        latitudeTextView= findViewById(R.id.latitudeTextView)
-        longitudeTextView= findViewById(R.id.longitudeTextView)
-        addLocationBtn= findViewById(R.id.addLocationBtn)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        addLocationBtn.setOnClickListener(){
-            addLocation()
-        }
+        val fragmentContainer =
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as SupportMapFragment
+        fragmentContainer.getMapAsync(this)
+
+        binding.addLocationBtn.setOnClickListener { addLocation() }
 
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu,menu)
+        menuInflater.inflate(R.menu.menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-        if (item.itemId == R.id.satellite){
-            myMap?.mapType= GoogleMap.MAP_TYPE_SATELLITE
-        }
-        if (item.itemId == R.id.hybrid){
-            myMap?.mapType= GoogleMap.MAP_TYPE_HYBRID
-        }
-        if (item.itemId == R.id.normal){
-            myMap?.mapType= GoogleMap.MAP_TYPE_NORMAL
-        }
-        if (item.itemId == R.id.terrain){
-            myMap?.mapType= GoogleMap.MAP_TYPE_TERRAIN
-        }
-        if (item.itemId == R.id.viewlocations){
-            val intent: Intent = Intent(this,SavedLocationActivity::class.java)
-            startActivity(intent);
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.satellite -> myMap?.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            R.id.hybrid -> myMap?.mapType = GoogleMap.MAP_TYPE_HYBRID
+            R.id.normal -> myMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
+            R.id.terrain -> myMap?.mapType = GoogleMap.MAP_TYPE_TERRAIN
+            R.id.viewlocations -> {
+                val intent = Intent(this, SavedLocationActivity::class.java)
+                startActivity(intent)
+            }
         }
         return true
     }
 
     override fun onMapReady(map: GoogleMap) {
-       myMap= map
-        map.setOnMapClickListener {
+        myMap = map
+        map.setOnMapClickListener { latLng ->
             map.clear()
-            map.addMarker(MarkerOptions().position(it))
-            map.moveCamera(CameraUpdateFactory.newLatLng(it))
-            latitudeTextView.text="Latitude:" + it.latitude.toString()
-            longitudeTextView.text="Longitude:"+ it.longitude.toString()
-
+            map.addMarker(MarkerOptions().position(latLng))
+            map.moveCamera(CameraUpdateFactory.newLatLng(latLng))
+            binding.latitudeTextView.text =
+                getString(R.string.latitude_placeholder, latLng.latitude.toString())
+            binding.longitudeTextView.text =
+                getString(R.string.longitude_placeholder, latLng.longitude.toString())
         }
     }
 
-    fun  addLocation(){
+    private fun addLocation() {
+        val noLatitudeSelected = getString(R.string.no_latitude_selected)
+        val noLongitudeSelected = getString(R.string.no_longitude_selected)
 
-        if (latitudeTextView.text != "NO LATITUDE SELECTED" && longitudeTextView.text != "NO LONGITUDE SELECTED") {
-            val locations =
-                Locations(0, latitudeTextView.text.toString(), longitudeTextView.text.toString())
-            database.insert(locations)
-            val st = database.writableDatabase
-            Toast.makeText(this, "Location Added", Toast.LENGTH_SHORT).show()
-        } else{
-            Toast.makeText(this, "Please select the location", Toast.LENGTH_SHORT).show()
+        val latitude = binding.latitudeTextView.text.toString()
+        val longitude = binding.longitudeTextView.text.toString()
+
+        if (latitude != noLatitudeSelected && longitude != noLongitudeSelected) {
+            val location =
+                Locations(0, latitude, longitude)
+            try {
+                database.insert(location)
+                Toast.makeText(this, R.string.location_added, Toast.LENGTH_SHORT).show()
+            } catch (err: Error) {
+                Toast.makeText(this, R.string.failed_to_add_location, Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(this, R.string.please_select_location, Toast.LENGTH_SHORT).show()
         }
     }
 }

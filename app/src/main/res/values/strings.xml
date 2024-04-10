@@ -6,4 +6,11 @@
     <string name="add_locationBtn">Add Location</string>
     <string name="SavedLocationTitle">Saved Locations</string>
     <string name="backBtn">Go Back</string>
+    <string name="latitude_placeholder">Latitude: %s</string>
+    <string name="longitude_placeholder">Longitude: %s</string>
+    <string name="no_latitude_selected">NO LATITUDE SELECTED</string>
+    <string name="no_longitude_selected">NO LONGITUDE SELECTED</string>
+    <string name="location_added">Location Added</string>
+    <string name="failed_to_add_location">Failed to add location</string>
+    <string name="please_select_location">Please select the location</string>
 </resources>
