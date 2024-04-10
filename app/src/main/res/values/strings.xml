@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Project2</string>
+    <string name="titlelocation">LOCATION CLICKED</string>
+    <string name="latitude">NO LATITUDE SELECTED</string>
+    <string name="longitude">NO LONGITUDE SELECTED</string>
+    <string name="add_locationBtn">Add Location</string>
+    <string name="SavedLocationTitle">Saved Locations</string>
+    <string name="backBtn">Go Back</string>
+</resources>
